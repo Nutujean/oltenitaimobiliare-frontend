@@ -35,6 +35,13 @@ function Navbar() {
             </li>
           </>
         )}
+        {/* Linkuri informative */}
+        <li>
+          <Link to="/despre-noi">Despre noi</Link>
+        </li>
+        <li>
+          <Link to="/contact">Contact</Link>
+        </li>
       </ul>
     </nav>
   );
