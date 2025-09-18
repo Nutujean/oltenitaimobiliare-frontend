@@ -2,15 +2,16 @@ import React from "react";
 
 function Confidentialitate() {
   return (
-    <div className="container">
-      <h1>Politica de confidențialitate</h1>
+    <div className="container form-box">
+      <h2>🔒 Politica de confidențialitate</h2>
       <p>
-        Respectăm confidențialitatea utilizatorilor noștri și protejăm datele
-        personale conform legislației în vigoare.
+        Protejarea datelor tale este importantă pentru noi. Toate datele 
+        colectate pe Oltenita Imobiliare sunt folosite doar pentru
+        funcționarea platformei și nu vor fi distribuite către terți.
       </p>
       <p>
-        Informațiile colectate sunt folosite exclusiv pentru funcționarea corectă a
-        platformei și nu vor fi divulgate unor terți fără acordul utilizatorului.
+        Dacă ai întrebări legate de datele tale, te rugăm să ne contactezi la 
+        <strong> contact@oltenitaimobiliare.ro</strong>.
       </p>
     </div>
   );

@@ -4,13 +4,16 @@ import { Link } from "react-router-dom";
 function Footer() {
   return (
     <footer className="footer">
-      <p>
-        <Link to="/termeni">Termeni și Condiții</Link> |{" "}
-        <Link to="/confidentialitate">Politica de Confidențialitate</Link> |{" "}
-        <Link to="/contact">Contact</Link> |{" "}
-        <Link to="/despre-noi">Despre Noi</Link>
-      </p>
-      <p>© {new Date().getFullYear()} OltenitaImobiliare.ro</p>
+      <div className="footer-container">
+        <p>© {new Date().getFullYear()} Oltenita Imobiliare. Toate drepturile rezervate.</p>
+        <ul className="footer-links">
+          <li><Link to="/contact">Contact</Link></li>
+          <li><Link to="/despre-noi">Despre noi</Link></li>
+          <li><Link to="/termeni">Termeni și condiții</Link></li>
+          <li><Link to="/faq">Întrebări frecvente</Link></li>
+          <li><Link to="/confidentialitate">Politica de confidențialitate</Link></li>
+        </ul>
+      </div>
     </footer>
   );
 }

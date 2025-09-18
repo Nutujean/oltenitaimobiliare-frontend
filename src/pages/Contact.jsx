@@ -2,13 +2,13 @@ import React from "react";
 
 function Contact() {
   return (
-    <div className="container">
-      <h1>Contact</h1>
-      <p>Pentru întrebări sau sugestii, ne poți contacta la:</p>
+    <div className="container form-box">
+      <h2>📩 Contact</h2>
+      <p>Pentru întrebări sau asistență, ne poți contacta la:</p>
       <ul>
         <li>Email: contact@oltenitaimobiliare.ro</li>
-        <li>Telefon: +40 700 000 000</li>
-        <li>Adresă: Str. Exemplu nr. 10, Oltenița, România</li>
+        <li>Telefon: +40 721 123 456</li>
+        <li>Adresă: Str. Principală nr. 10, Oltenița</li>
       </ul>
     </div>
   );

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import BlueButton from "../components/BlueButton";
 
 function Register() {
-  const [nume, setNume] = useState("");
   const [email, setEmail] = useState("");
   const [parola, setParola] = useState("");
+  const [telefon, setTelefon] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -14,16 +14,18 @@ function Register() {
 
     try {
       const response = await fetch(
-        "https://oltenitaimobiliare-backend.onrender.com/api/register",
+        "https://imobila-market-backend.onrender.com/api/register",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nume, email, parola }),
+          body: JSON.stringify({ email, parola, telefon }),
         }
       );
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Eroare la înregistrare");
+      if (!response.ok) {
+        throw new Error(data.error || "Eroare la înregistrare");
+      }
 
       navigate("/login");
     } catch (err) {
@@ -34,18 +36,10 @@ function Register() {
   return (
     <div className="container">
       <div className="form-box">
-        <h2>🆕 Creează cont</h2>
+        <h2>🆕 Înregistrare</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <form onSubmit={handleSubmit} className="form-styled">
-          <input
-            type="text"
-            placeholder="Nume complet"
-            value={nume}
-            onChange={(e) => setNume(e.target.value)}
-            required
-          />
-
           <input
             type="email"
             placeholder="Email"
@@ -56,14 +50,21 @@ function Register() {
 
           <input
             type="password"
-            placeholder="Parola"
+            placeholder="Parolă"
             value={parola}
             onChange={(e) => setParola(e.target.value)}
             required
           />
 
-          <BlueButton type="submit" style={{ width: "100%", marginTop: "10px" }}>
-            Înregistrează-te
+          <input
+            type="text"
+            placeholder="Telefon (opțional)"
+            value={telefon}
+            onChange={(e) => setTelefon(e.target.value)}
+          />
+
+          <BlueButton type="submit" style={{ marginTop: "15px", width: "100%" }}>
+            📝 Creează cont
           </BlueButton>
         </form>
       </div>

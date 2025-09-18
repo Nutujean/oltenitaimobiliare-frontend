@@ -9,10 +9,20 @@ function Home() {
   useEffect(() => {
     const fetchAnunturi = async () => {
       try {
-        const response = await fetch("https://imobila-market-backend.onrender.com/api/anunturi");
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/anunturi`
+        );
         const data = await response.json();
         if (response.ok) {
-          setAnunturi(data);
+          // 🔹 Sortează: Diamond > Gold > restul
+          const sorted = data.sort((a, b) => {
+            if (a.pachet === "Diamond" && b.pachet !== "Diamond") return -1;
+            if (b.pachet === "Diamond" && a.pachet !== "Diamond") return 1;
+            if (a.pachet === "Gold" && b.pachet === "Basic") return -1;
+            if (b.pachet === "Gold" && a.pachet === "Basic") return 1;
+            return 0;
+          });
+          setAnunturi(sorted);
         } else {
           setError(data.error || "Eroare la încărcarea anunțurilor");
         }
@@ -30,32 +40,8 @@ function Home() {
         <div className="hero-content">
           <h1>Anunțuri imobiliare în Oltenița</h1>
           <p>Găsește cele mai bune oferte de vânzare, cumpărare și închiriere</p>
-          <BlueButton style={{ marginTop: "15px" }}>
-            Vezi oferte
-          </BlueButton>
+          <BlueButton style={{ marginTop: "15px" }}>Vezi oferte</BlueButton>
         </div>
-      </section>
-
-      {/* ===== Formular Căutare Rapidă ===== */}
-      <section className="search-section container">
-        <h2>Caută rapid</h2>
-        <form className="search-form">
-          <input type="text" placeholder="Caută locația" />
-          <select>
-            <option>Apartamente</option>
-            <option>Case</option>
-            <option>Garsoniere</option>
-            <option>Terenuri</option>
-            <option>Garaje</option>
-            <option>Spațiu comercial</option>
-          </select>
-          <select>
-            <option>Vânzare</option>
-            <option>Cumpărare</option>
-            <option>Închiriere</option>
-          </select>
-          <BlueButton type="submit">Caută</BlueButton>
-        </form>
       </section>
 
       {/* ===== Lista Anunțuri ===== */}
@@ -65,17 +51,31 @@ function Home() {
 
         <div className="grid">
           {anunturi.map((anunt) => (
-            <div key={anunt._id} className="card">
+            <div
+              key={anunt._id}
+              className={`card ${
+                anunt.pachet === "Diamond"
+                  ? "card-diamond"
+                  : anunt.pachet === "Gold"
+                  ? "card-gold"
+                  : ""
+              }`}
+            >
               {anunt.imagini?.length > 0 && (
-                <img
-                  src={`https://imobila-market-backend.onrender.com${anunt.imagini[0]}`}
-                  alt={anunt.titlu}
-                />
+                <img src={anunt.imagini[0]} alt={anunt.titlu} />
               )}
               <h3>{anunt.titlu}</h3>
               <p>{anunt.descriere.substring(0, 80)}...</p>
               <p className="pret">{anunt.pret} €</p>
               <span className="badge">{anunt.categorie}</span>
+
+              {/* 🔹 Badge Premium */}
+              {anunt.pachet === "Gold" && (
+                <span className="badge-gold">⭐ Gold</span>
+              )}
+              {anunt.pachet === "Diamond" && (
+                <span className="badge-diamond">💎 Diamond</span>
+              )}
 
               <Link to={`/anunt/${anunt._id}`}>
                 <BlueButton style={{ marginTop: "10px", width: "100%" }}>

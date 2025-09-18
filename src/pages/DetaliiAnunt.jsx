@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import BlueButton from "../components/BlueButton";
+import { useParams } from "react-router-dom";
 
 function DetaliiAnunt() {
   const { id } = useParams();
@@ -11,7 +10,7 @@ function DetaliiAnunt() {
     const fetchAnunt = async () => {
       try {
         const response = await fetch(
-          `https://imobila-market-backend.onrender.com/api/anunturi/${id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/anunturi/${id}`
         );
         const data = await response.json();
         if (response.ok) {
@@ -19,7 +18,7 @@ function DetaliiAnunt() {
         } else {
           setError(data.error || "Eroare la încărcarea anunțului");
         }
-      } catch (err) {
+      } catch {
         setError("Eroare server");
       }
     };
@@ -30,31 +29,28 @@ function DetaliiAnunt() {
   if (!anunt) return <p>Se încarcă...</p>;
 
   return (
-    <div className="container">
-      <div className="detalii-anunt">
-        {/* ===== Galerie imagini ===== */}
-        {anunt.imagini?.length > 0 && (
-          <div className="galerie">
-            {anunt.imagini.map((img, index) => (
-              <img
-                key={index}
-                src={`https://imobila-market-backend.onrender.com${img}`}
-                alt={`${anunt.titlu} - ${index + 1}`}
-              />
-            ))}
-          </div>
+    <div className="container detalii-anunt">
+      {anunt.imagini?.length > 0 && (
+        <img
+          src={anunt.imagini[0]}
+          alt={anunt.titlu}
+          className="detalii-img"
+        />
+      )}
+
+      <h2>
+        {anunt.titlu}{" "}
+        {anunt.pachet === "Gold" && (
+          <span className="badge-gold">⭐ Gold</span>
         )}
+        {anunt.pachet === "Diamond" && (
+          <span className="badge-diamond">💎 Diamond</span>
+        )}
+      </h2>
 
-        <h2>{anunt.titlu}</h2>
-        <p className="pret">{anunt.pret} €</p>
-        <p><strong>Tip tranzacție:</strong> {anunt.tranzactie}</p>
-        <p><strong>Categorie:</strong> {anunt.categorie}</p>
-        <p className="descriere">{anunt.descriere}</p>
-
-        <Link to="/">
-          <BlueButton style={{ marginTop: "15px" }}>⬅️ Înapoi la listă</BlueButton>
-        </Link>
-      </div>
+      <p className="pret">{anunt.pret} €</p>
+      <p className="badge">{anunt.categorie}</p>
+      <p>{anunt.descriere}</p>
     </div>
   );
 }
