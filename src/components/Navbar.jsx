@@ -1,98 +1,43 @@
-/* ===== Navbar General ===== */
-.navbar {
-  background: #007bff;
-  color: white;
-  padding: 12px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+import React from "react";
+import { Link } from "react-router-dom";
+import "./Navbar.css"; // importăm stilurile din fișierul CSS separat
+
+function Navbar() {
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-logo">
+        <Link to="/">OltenitaImobiliare.ro</Link>
+      </div>
+
+      <ul className="navbar-links">
+        <li>
+          <Link to="/">Acasă</Link>
+        </li>
+        {isLoggedIn && (
+          <li>
+            <Link to="/adauga-anunt">Adaugă anunț</Link>
+          </li>
+        )}
+        {isLoggedIn && (
+          <li>
+            <Link to="/anunturile-mele">Anunțurile mele</Link>
+          </li>
+        )}
+        {!isLoggedIn && (
+          <>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
+          </>
+        )}
+      </ul>
+    </nav>
+  );
 }
 
-.nav-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* ===== Logo ===== */
-.logo {
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: white;
-  text-decoration: none;
-}
-
-/* ===== Links ===== */
-.nav-links {
-  display: flex;
-  align-items: center;
-}
-
-.nav-links a,
-.nav-links button {
-  color: white;
-  text-decoration: none;
-  margin-left: 15px;
-  font-size: 1rem;
-  transition: opacity 0.2s, border-bottom 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links button:hover {
-  opacity: 0.85;
-  border-bottom: 2px solid white;
-}
-
-.nav-links button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-/* ===== Buton meniu mobil ===== */
-.menu-toggle {
-  display: none;
-  font-size: 1.8rem;
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
-    z-index: 1100;
-  }
-
-  /* Meniul pe mobil */
-  .nav-links {
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 70%;
-    height: 100vh;
-    background: #007bff;
-    padding-top: 80px;
-    text-align: center;
-    box-shadow: -4px 0 8px rgba(0,0,0,0.2);
-
-    transition: right 0.3s ease-in-out;
-  }
-
-  .nav-links.active {
-    right: 0;
-  }
-
-  .nav-links a,
-  .nav-links button {
-    margin: 15px 0;
-    font-size: 1.2rem;
-  }
-}
+export default Navbar;
