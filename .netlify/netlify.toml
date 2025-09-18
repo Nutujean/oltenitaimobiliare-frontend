@@ -10,7 +10,6 @@ redirects = []
 publish = "C:\\Users\\luiza\\imobilia-market\\client\\dist"
 publishOrigin = "ui"
 commandOrigin = "ui"
-base = "C:\\Users\\luiza\\imobilia-market\\client"
 command = "npm run build"
 
 [build.environment]

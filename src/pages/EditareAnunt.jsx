@@ -1,44 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import BlueButton from "../components/BlueButton";
 
 function EditareAnunt() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [titlu, setTitlu] = useState("");
   const [descriere, setDescriere] = useState("");
   const [pret, setPret] = useState("");
   const [categorie, setCategorie] = useState("Apartamente");
-  const [tipTranzactie, setTipTranzactie] = useState("Cumpărare");
+  const [tranzactie, setTranzactie] = useState("Cumpărare");
   const [imagini, setImagini] = useState([]);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
-  // Preia datele existente
+  // ===== Preluăm datele existente =====
   useEffect(() => {
     const fetchAnunt = async () => {
       try {
         const response = await fetch(
-          `https://oltenitaimobiliare-backend.onrender.com/api/anunturi/${id}`,
-          {
-            headers: { Authorization: localStorage.getItem("token") },
-          }
+          `https://imobila-market-backend.onrender.com/api/anunturi/${id}`
         );
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Eroare la încărcare");
-
-        setTitlu(data.titlu);
-        setDescriere(data.descriere);
-        setPret(data.pret);
-        setCategorie(data.categorie);
-        setTipTranzactie(data.tipTranzactie || "Cumpărare");
+        if (response.ok) {
+          setTitlu(data.titlu);
+          setDescriere(data.descriere);
+          setPret(data.pret);
+          setCategorie(data.categorie);
+          setTranzactie(data.tranzactie || "Cumpărare");
+          setImagini(data.imagini || []);
+        } else {
+          setError(data.error || "Eroare la încărcarea anunțului");
+        }
       } catch (err) {
-        setError(err.message);
+        setError("Eroare server");
       }
     };
     fetchAnunt();
   }, [id]);
 
-  // Salvare modificări
+  // ===== Salvăm modificările =====
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,7 +48,7 @@ function EditareAnunt() {
     formData.append("descriere", descriere);
     formData.append("pret", pret);
     formData.append("categorie", categorie);
-    formData.append("tipTranzactie", tipTranzactie);
+    formData.append("tranzactie", tranzactie);
 
     for (let i = 0; i < imagini.length; i++) {
       formData.append("imagini", imagini[i]);
@@ -55,16 +56,20 @@ function EditareAnunt() {
 
     try {
       const response = await fetch(
-        `https://oltenitaimobiliare-backend.onrender.com/api/anunturi/${id}`,
+        `https://imobila-market-backend.onrender.com/api/anunturi/${id}`,
         {
           method: "PUT",
-          headers: { Authorization: localStorage.getItem("token") },
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
           body: formData,
         }
       );
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Eroare la editare");
+      if (!response.ok) {
+        throw new Error(data.error || "Eroare la editarea anunțului");
+      }
 
       navigate("/anunturile-mele");
     } catch (err) {
@@ -75,7 +80,7 @@ function EditareAnunt() {
   return (
     <div className="container">
       <div className="form-box">
-        <h2>✏ Editare anunț</h2>
+        <h2>✏️ Editează anunțul</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <form onSubmit={handleSubmit} className="form-styled">
@@ -112,11 +117,12 @@ function EditareAnunt() {
             <option>Garsoniere</option>
             <option>Terenuri</option>
             <option>Garaje</option>
+            <option>Spațiu comercial</option>
           </select>
 
           <select
-            value={tipTranzactie}
-            onChange={(e) => setTipTranzactie(e.target.value)}
+            value={tranzactie}
+            onChange={(e) => setTranzactie(e.target.value)}
           >
             <option>Cumpărare</option>
             <option>Vânzare</option>

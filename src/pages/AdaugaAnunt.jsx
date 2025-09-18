@@ -7,7 +7,7 @@ function AdaugaAnunt() {
   const [descriere, setDescriere] = useState("");
   const [pret, setPret] = useState("");
   const [categorie, setCategorie] = useState("Apartamente");
-  const [tipTranzactie, setTipTranzactie] = useState("Cumpărare");
+  const [tranzactie, setTranzactie] = useState("Cumpărare");
   const [imagini, setImagini] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function AdaugaAnunt() {
     formData.append("descriere", descriere);
     formData.append("pret", pret);
     formData.append("categorie", categorie);
-    formData.append("tipTranzactie", tipTranzactie);
+    formData.append("tranzactie", tranzactie);
 
     for (let i = 0; i < imagini.length; i++) {
       formData.append("imagini", imagini[i]);
@@ -28,7 +28,7 @@ function AdaugaAnunt() {
 
     try {
       const response = await fetch(
-        "https://oltenitaimobiliare-backend.onrender.com/api/anunturi",
+        "https://imobila-market-backend.onrender.com/api/anunturi",
         {
           method: "POST",
           headers: {
@@ -89,11 +89,12 @@ function AdaugaAnunt() {
             <option>Garsoniere</option>
             <option>Terenuri</option>
             <option>Garaje</option>
+            <option>Spațiu comercial</option>
           </select>
 
           <select
-            value={tipTranzactie}
-            onChange={(e) => setTipTranzactie(e.target.value)}
+            value={tranzactie}
+            onChange={(e) => setTranzactie(e.target.value)}
           >
             <option>Cumpărare</option>
             <option>Vânzare</option>

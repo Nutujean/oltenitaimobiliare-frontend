@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import BlueButton from "../components/BlueButton";
 
 function DetaliiAnunt() {
@@ -11,7 +11,7 @@ function DetaliiAnunt() {
     const fetchAnunt = async () => {
       try {
         const response = await fetch(
-          `https://oltenitaimobiliare-backend.onrender.com/api/anunturi/${id}`
+          `https://imobila-market-backend.onrender.com/api/anunturi/${id}`
         );
         const data = await response.json();
         if (response.ok) {
@@ -31,31 +31,29 @@ function DetaliiAnunt() {
 
   return (
     <div className="container">
-      <div className="detalii-box">
-        {/* ===== Imagine principală ===== */}
+      <div className="detalii-anunt">
+        {/* ===== Galerie imagini ===== */}
         {anunt.imagini?.length > 0 && (
-          <img src={anunt.imagini[0]} alt={anunt.titlu} className="detalii-img" />
+          <div className="galerie">
+            {anunt.imagini.map((img, index) => (
+              <img
+                key={index}
+                src={`https://imobila-market-backend.onrender.com${img}`}
+                alt={`${anunt.titlu} - ${index + 1}`}
+              />
+            ))}
+          </div>
         )}
 
-        {/* ===== Titlu + Preț ===== */}
-        <h1>{anunt.titlu}</h1>
-        <p className="detalii-pret">{anunt.pret} €</p>
+        <h2>{anunt.titlu}</h2>
+        <p className="pret">{anunt.pret} €</p>
+        <p><strong>Tip tranzacție:</strong> {anunt.tranzactie}</p>
+        <p><strong>Categorie:</strong> {anunt.categorie}</p>
+        <p className="descriere">{anunt.descriere}</p>
 
-        {/* ===== Categorie + Tip tranzacție ===== */}
-        <div className="detalii-info">
-          <span className="badge">{anunt.categorie}</span>
-          {anunt.tipTranzactie && (
-            <span className="badge badge-green">{anunt.tipTranzactie}</span>
-          )}
-        </div>
-
-        {/* ===== Descriere ===== */}
-        <p className="detalii-descriere">{anunt.descriere}</p>
-
-        {/* ===== Buton Înapoi ===== */}
-        <BlueButton onClick={() => window.history.back()} style={{ marginTop: "15px" }}>
-          ⬅ Înapoi
-        </BlueButton>
+        <Link to="/">
+          <BlueButton style={{ marginTop: "15px" }}>⬅️ Înapoi la listă</BlueButton>
+        </Link>
       </div>
     </div>
   );

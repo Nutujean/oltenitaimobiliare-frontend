@@ -5,22 +5,20 @@ import BlueButton from "../components/BlueButton";
 function AnunturileMele() {
   const [anunturi, setAnunturi] = useState([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
 
-  // Fetch anunturile utilizatorului
   useEffect(() => {
-    const fetchMyAds = async () => {
+    const fetchAnunturi = async () => {
       try {
         const response = await fetch(
-          "https://oltenitaimobiliare-backend.onrender.com/api/anunturile-mele",
+          "https://imobila-market-backend.onrender.com/api/anunturile-mele",
           {
             headers: {
               Authorization: localStorage.getItem("token"),
             },
           }
         );
-        const data = await response.json();
 
+        const data = await response.json();
         if (response.ok) {
           setAnunturi(data);
         } else {
@@ -28,20 +26,17 @@ function AnunturileMele() {
         }
       } catch (err) {
         setError("Eroare server");
-      } finally {
-        setLoading(false);
       }
     };
-    fetchMyAds();
+    fetchAnunturi();
   }, []);
 
-  // Ștergere anunț
   const handleDelete = async (id) => {
     if (!window.confirm("Sigur vrei să ștergi acest anunț?")) return;
 
     try {
       const response = await fetch(
-        `https://oltenitaimobiliare-backend.onrender.com/api/anunturi/${id}`,
+        `https://imobila-market-backend.onrender.com/api/anunturi/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -50,21 +45,21 @@ function AnunturileMele() {
         }
       );
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Eroare la ștergere");
-
-      setAnunturi(anunturi.filter((a) => a._id !== id));
+      if (response.ok) {
+        setAnunturi(anunturi.filter((anunt) => anunt._id !== id));
+      } else {
+        const data = await response.json();
+        alert(data.error || "Eroare la ștergere");
+      }
     } catch (err) {
-      alert(err.message);
+      alert("Eroare server");
     }
   };
 
-  if (loading) return <p>Se încarcă...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
   return (
     <div className="container">
-      <h2 className="section-title">📋 Anunțurile mele</h2>
+      <h2>📋 Anunțurile Mele</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       {anunturi.length === 0 ? (
         <p>Nu ai niciun anunț adăugat.</p>
@@ -73,39 +68,29 @@ function AnunturileMele() {
           {anunturi.map((anunt) => (
             <div key={anunt._id} className="card">
               {anunt.imagini?.length > 0 && (
-                <img src={anunt.imagini[0]} alt={anunt.titlu} />
+                <img
+                  src={`https://imobila-market-backend.onrender.com${anunt.imagini[0]}`}
+                  alt={anunt.titlu}
+                />
               )}
-              <div className="card-body">
-                <h3>{anunt.titlu}</h3>
-                <p className="pret">{anunt.pret} €</p>
+              <h3>{anunt.titlu}</h3>
+              <p>{anunt.descriere.substring(0, 80)}...</p>
+              <p className="pret">{anunt.pret} €</p>
+              <p>
+                <strong>Tip tranzacție:</strong> {anunt.tranzactie}
+              </p>
+              <span className="badge">{anunt.categorie}</span>
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    flexWrap: "wrap",
-                    marginBottom: "10px",
-                  }}
+              <div style={{ marginTop: "10px" }}>
+                <Link to={`/editare-anunt/${anunt._id}`}>
+                  <BlueButton style={{ marginRight: "10px" }}>✏️ Editează</BlueButton>
+                </Link>
+                <BlueButton
+                  onClick={() => handleDelete(anunt._id)}
+                  style={{ background: "red" }}
                 >
-                  <span className="badge">{anunt.categorie}</span>
-                  {anunt.tipTranzactie && (
-                    <span className="badge badge-green">
-                      {anunt.tipTranzactie}
-                    </span>
-                  )}
-                </div>
-
-                <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-                  <Link to={`/editare-anunt/${anunt._id}`} style={{ flex: 1 }}>
-                    <BlueButton style={{ width: "100%" }}>✏ Editare</BlueButton>
-                  </Link>
-                  <BlueButton
-                    style={{ flex: 1, backgroundColor: "red" }}
-                    onClick={() => handleDelete(anunt._id)}
-                  >
-                    🗑 Șterge
-                  </BlueButton>
-                </div>
+                  🗑️ Șterge
+                </BlueButton>
               </div>
             </div>
           ))}

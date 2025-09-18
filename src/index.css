@@ -1,49 +1,51 @@
-/* ===== Reset ===== */
+/* ===== Reset de bază ===== */
 body {
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f7f9fc;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
   color: #333;
 }
 
-/* ===== Container ===== */
+/* ===== Container global ===== */
 .container {
-  width: 90%;
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+  background: #007bff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar a {
+  color: white;
+  margin: 0 12px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navbar a:hover {
+  color: #dbeafe;
 }
 
 /* ===== Hero Section ===== */
 .hero {
-  position: relative;
-  background: url("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=80")
-    center/cover no-repeat;
-  height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  text-align: center;
+  padding: 70px 20px;
   border-radius: 0 0 20px 20px;
   margin-bottom: 30px;
 }
 
-.hero-overlay {
-  background: rgba(0, 91, 187, 0.7);
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0 0 20px 20px;
-}
-
-.hero-content {
-  text-align: center;
-  color: #fff;
-  padding: 20px;
-}
-
 .hero h1 {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   margin-bottom: 10px;
 }
 
@@ -57,7 +59,7 @@ body {
   background: #fff;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
   margin-bottom: 30px;
 }
 
@@ -70,35 +72,26 @@ body {
 .search-form input,
 .search-form select {
   flex: 1;
-  min-width: 180px;
+  min-width: 150px;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   border-radius: 8px;
-}
-
-/* ===== Section Title ===== */
-.section-title {
-  font-size: 1.6rem;
-  margin-bottom: 20px;
-  color: #005bbb;
+  font-size: 0.95rem;
 }
 
 /* ===== Grid Anunturi ===== */
-.grid {
+.grid, .grid-premium {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
-  margin-bottom: 40px;
 }
 
-/* ===== Card ===== */
 .card {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+  padding: 15px;
   transition: transform 0.2s;
 }
 
@@ -108,117 +101,42 @@ body {
 
 .card img {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
-}
-
-.card-body {
-  padding: 15px;
-}
-
-.card-body h3 {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.card-body .pret {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #007bff;
-  margin-bottom: 10px;
-}
-
-.card-body .descriere {
-  font-size: 0.95rem;
-  color: #555;
+  border-radius: 10px;
   margin-bottom: 12px;
 }
 
-/* ===== Badge ===== */
-.badge {
-  display: inline-block;
-  padding: 6px 12px;
-  background: #e7f0ff;
-  color: #005bbb;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.badge-green {
-  background: #e6ffed;
-  color: #007b33;
-}
-
-/* ===== Navbar ===== */
-.navbar {
-  background: #005bbb;
-  color: #fff;
-  padding: 15px 0;
-  box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-
-.nav-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #fff;
-  text-decoration: none;
-}
-
-.logo span {
-  color: #ffd700;
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-links li a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-
-.nav-links li a:hover {
-  opacity: 0.8;
-}
-
-/* ===== Footer ===== */
-.footer {
-  background: #f1f5fb;
-  padding: 20px 0;
-  text-align: center;
-  margin-top: 40px;
-  border-top: 2px solid #e2e6ef;
+.card h3 {
+  margin: 10px 0;
+  font-size: 1.2rem;
   color: #333;
 }
 
-.footer p {
+.card p {
   margin: 5px 0;
-  font-size: 0.95rem;
 }
 
-/* ===== Form Box ===== */
+.card .pret {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* ===== Premium Cards ===== */
+.premium {
+  border: 2px solid #007bff;
+  background: #f0f7ff;
+}
+
+/* ===== Form Box (Adauga/Editare) ===== */
 .form-box {
   background: #fff;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-  max-width: 500px;
-  margin: 40px auto;
+  max-width: 600px;
+  margin: 30px auto;
 }
 
 .form-box h2 {
@@ -227,7 +145,6 @@ body {
   text-align: center;
 }
 
-/* ===== Form Styled ===== */
 .form-styled {
   display: flex;
   flex-direction: column;
@@ -251,8 +168,8 @@ body {
   outline: none;
 }
 
-/* ===== Detalii Anunt ===== */
-.detalii-box {
+/* ===== Detalii Anunț ===== */
+.detalii-anunt {
   background: #fff;
   padding: 25px;
   border-radius: 12px;
@@ -270,29 +187,62 @@ body {
   margin-bottom: 20px;
 }
 
-.detalii-box h1 {
-  font-size: 1.8rem;
+.detalii-anunt h2 {
+  color: #007bff;
   margin-bottom: 10px;
-  color: #333;
 }
 
-.detalii-pret {
+.detalii-anunt .pret {
   font-size: 1.6rem;
   font-weight: bold;
   color: #007bff;
   margin: 10px 0;
 }
 
-.detalii-info {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
+.detalii-anunt .descriere {
+  margin-top: 15px;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: left;
 }
 
-.detalii-descriere {
-  font-size: 1rem;
-  color: #444;
-  line-height: 1.5;
+/* ===== Galerie imagini ===== */
+.galerie {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
   margin-bottom: 20px;
+}
+
+.galerie img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.galerie img:hover {
+  transform: scale(1.03);
+}
+
+/* ===== Footer ===== */
+.footer {
+  background: #f1f1f1;
+  padding: 25px 20px;
+  margin-top: 40px;
+  text-align: center;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.footer a {
+  color: #007bff;
+  margin: 0 8px;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
 }
