@@ -8,7 +8,6 @@ function AdaugaAnunt() {
   const [pret, setPret] = useState("");
   const [categorie, setCategorie] = useState("Apartamente");
   const [tranzactie, setTranzactie] = useState("Vânzare");
-  const [pachet, setPachet] = useState("Basic");
   const [imagini, setImagini] = useState([]);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -22,19 +21,16 @@ function AdaugaAnunt() {
     formData.append("pret", pret);
     formData.append("categorie", categorie);
     formData.append("tranzactie", tranzactie);
-
     for (let i = 0; i < imagini.length; i++) {
       formData.append("imagini", imagini[i]);
     }
 
     try {
       const response = await fetch(
-        "https://imobila-market-backend.onrender.com/api/anunturi",
+        `${import.meta.env.VITE_BACKEND_URL}/api/anunturi`,
         {
           method: "POST",
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
+          headers: { Authorization: localStorage.getItem("token") },
           body: formData,
         }
       );
@@ -42,27 +38,6 @@ function AdaugaAnunt() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Eroare la adăugarea anunțului");
 
-      // Dacă pachetul e Gold/Diamond → duce la Stripe
-      if (pachet !== "Basic") {
-        const plata = await fetch(
-          "https://imobila-market-backend.onrender.com/api/plata",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: localStorage.getItem("token"),
-            },
-            body: JSON.stringify({ pachet, anuntId: data._id }),
-          }
-        );
-        const resPlata = await plata.json();
-        if (resPlata.url) {
-          window.location.href = resPlata.url; // redirecționează spre Stripe
-          return;
-        }
-      }
-
-      // Dacă e Basic → duce direct la Anunțurile Mele
       navigate("/anunturile-mele");
     } catch (err) {
       setError(err.message);
@@ -111,23 +86,13 @@ function AdaugaAnunt() {
 
           <select value={tranzactie} onChange={(e) => setTranzactie(e.target.value)}>
             <option>Vânzare</option>
-            <option>Cumpărare</option>
             <option>Închiriere</option>
+            <option>Cumpărare</option>
           </select>
-
-          {/* Alegere pachet */}
-          <label>
-            Alege tipul anunțului:
-            <select value={pachet} onChange={(e) => setPachet(e.target.value)}>
-              <option value="Basic">Basic (gratuit)</option>
-              <option value="Gold">⭐ Gold (25 lei / 7 zile)</option>
-              <option value="Diamond">💎 Diamond (49 lei / 20 zile)</option>
-            </select>
-          </label>
 
           <input type="file" multiple onChange={(e) => setImagini(e.target.files)} />
 
-          <BlueButton type="submit" style={{ marginTop: "15px", width: "100%" }}>
+          <BlueButton type="submit" style={{ marginTop: 15, width: "100%" }}>
             🚀 Publică anunțul
           </BlueButton>
         </form>

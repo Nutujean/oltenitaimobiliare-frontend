@@ -260,3 +260,43 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+/* ===== Form Box ===== */
+.form-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.form-box h2 {
+  margin-bottom: 20px;
+  color: #007bff;
+  text-align: center;
+}
+
+/* ===== Form Styled ===== */
+.form-styled {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-styled input,
+.form-styled textarea,
+.form-styled select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+.form-styled input:focus,
+.form-styled textarea:focus,
+.form-styled select:focus {
+  border-color: #007bff;
+  outline: none;
+}
