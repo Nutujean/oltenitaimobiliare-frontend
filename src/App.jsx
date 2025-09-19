@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 // Pagini
 import Home from "./pages/Home";
@@ -16,10 +17,7 @@ import Confidentialitate from "./pages/Confidentialitate";
 function App() {
   return (
     <Router>
-      {/* Navbar vizibil pe toate paginile */}
       <Navbar />
-
-      {/* Spațiu ca să nu fie acoperit de navbar-ul fix */}
       <div className="pt-16">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -34,6 +32,7 @@ function App() {
           <Route path="/confidentialitate" element={<Confidentialitate />} />
         </Routes>
       </div>
+      <Footer />
     </Router>
   );
 }

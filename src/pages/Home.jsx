@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AnuntCard from "../components/AnuntCard";
 
 export default function Home() {
-  const [locatie, setLocatie] = useState("");
-  const [tip, setTip] = useState("");
-  const [camere, setCamere] = useState("");
+  const [anunturi, setAnunturi] = useState([]);
 
-  const handleSearch = () => {
-    alert(`Cauți în: ${locatie}, tip: ${tip}, camere: ${camere}`);
-    // aici facem redirect la pagina de listare filtrată
-  };
+  useEffect(() => {
+    fetch("https://imobila-market-backend.onrender.com/api/anunturi")
+      .then((res) => res.json())
+      .then((data) => setAnunturi(data))
+      .catch((err) => console.error("Eroare la fetch anunturi:", err));
+  }, []);
 
   return (
     <div>
@@ -28,46 +29,26 @@ export default function Home() {
       {/* BARA DE CĂUTARE RAPIDĂ */}
       <div className="max-w-4xl mx-auto -mt-10 bg-white shadow-lg rounded-lg p-6 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Locație */}
           <input
             type="text"
             placeholder="Introdu locația..."
-            value={locatie}
-            onChange={(e) => setLocatie(e.target.value)}
             className="border rounded-lg px-3 py-2 w-full"
           />
-
-          {/* Tip imobil */}
-          <select
-            value={tip}
-            onChange={(e) => setTip(e.target.value)}
-            className="border rounded-lg px-3 py-2 w-full"
-          >
-            <option value="">Tip imobil</option>
-            <option value="apartament">Apartament</option>
-            <option value="casa">Casă / Vilă</option>
-            <option value="teren">Teren</option>
-            <option value="garaj">Garaj</option>
+          <select className="border rounded-lg px-3 py-2 w-full">
+            <option>Tip imobil</option>
+            <option>Apartament</option>
+            <option>Casă</option>
+            <option>Teren</option>
+            <option>Garaj</option>
           </select>
-
-          {/* Camere */}
-          <select
-            value={camere}
-            onChange={(e) => setCamere(e.target.value)}
-            className="border rounded-lg px-3 py-2 w-full"
-          >
-            <option value="">Nr. camere</option>
-            <option value="1">1 cameră</option>
-            <option value="2">2 camere</option>
-            <option value="3">3 camere</option>
-            <option value="4+">4+ camere</option>
+          <select className="border rounded-lg px-3 py-2 w-full">
+            <option>Nr. camere</option>
+            <option>1 cameră</option>
+            <option>2 camere</option>
+            <option>3 camere</option>
+            <option>4+ camere</option>
           </select>
-
-          {/* Buton căutare */}
-          <button
-            onClick={handleSearch}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full"
-          >
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
             Caută
           </button>
         </div>
@@ -76,7 +57,15 @@ export default function Home() {
       {/* ANUNȚURI RECENTE */}
       <section className="max-w-6xl mx-auto px-4 py-10">
         <h2 className="text-2xl font-bold mb-6">📢 Anunțuri recente</h2>
-        {/* aici bagi cardurile cu anunțuri */}
+        {anunturi.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {anunturi.map((anunt) => (
+              <AnuntCard key={anunt._id} anunt={anunt} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">Nu există anunțuri momentan.</p>
+        )}
       </section>
     </div>
   );
