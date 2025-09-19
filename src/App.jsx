@@ -7,6 +7,9 @@ import Home from "./pages/Home";
 import AdaugaAnunt from "./pages/AdaugaAnunt";
 import AnunturileMele from "./pages/AnunturileMele";
 import DetaliiAnunt from "./pages/DetaliiAnunt";
+import EditareAnunt from "./pages/EditareAnunt";
+import ListaAnunturi from "./pages/ListaAnunturi"; // ✅ import corect
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Contact from "./pages/Contact";
@@ -24,6 +27,8 @@ function App() {
           <Route path="/adauga-anunt" element={<AdaugaAnunt />} />
           <Route path="/anunturile-mele" element={<AnunturileMele />} />
           <Route path="/anunt/:id" element={<DetaliiAnunt />} />
+          <Route path="/editare-anunt/:id" element={<EditareAnunt />} />
+          <Route path="/anunturi" element={<ListaAnunturi />} /> {/* ✅ listă anunțuri */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/contact" element={<Contact />} />

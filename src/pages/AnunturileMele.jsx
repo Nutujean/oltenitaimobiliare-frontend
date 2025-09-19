@@ -1,108 +1,88 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import BlueButton from "../components/BlueButton";
 
-function AnunturileMele() {
+export default function AnunturileMele() {
   const [anunturi, setAnunturi] = useState([]);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAnunturi = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/anunturile-mele`,
-          {
-            headers: { Authorization: localStorage.getItem("token") },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setAnunturi(data);
-        } else {
-          setError(data.error || "Eroare la încărcarea anunțurilor");
-        }
-      } catch (err) {
-        setError("Eroare server");
-      }
-    };
-    fetchAnunturi();
-  }, []);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    fetch("https://imobila-market-backend.onrender.com/api/anunturile-mele", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setAnunturi(data))
+      .catch((err) => console.error("Eroare la încărcare:", err));
+  }, [navigate]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Ești sigur că vrei să ștergi acest anunț?")) return;
+    const confirm = window.confirm("Sigur vrei să ștergi acest anunț?");
+    if (!confirm) return;
 
+    const token = localStorage.getItem("token");
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/anunturi/${id}`,
+      const res = await fetch(
+        `https://imobila-market-backend.onrender.com/api/anunturi/${id}`,
         {
           method: "DELETE",
-          headers: { Authorization: localStorage.getItem("token") },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      if (response.ok) {
+      if (res.ok) {
         setAnunturi(anunturi.filter((a) => a._id !== id));
       } else {
-        const data = await response.json();
-        setError(data.error || "Eroare la ștergere");
+        alert("Eroare la ștergere");
       }
-    } catch {
-      setError("Eroare server");
+    } catch (err) {
+      console.error(err);
+      alert("Eroare la server");
     }
   };
 
   return (
-    <div className="container">
-      <h2>📋 Anunțurile mele</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {anunturi.length === 0 ? (
-        <p>Nu ai niciun anunț adăugat.</p>
-      ) : (
-        <div className="grid">
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <h1 className="text-2xl font-bold mb-6">📂 Anunțurile mele</h1>
+      {anunturi.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {anunturi.map((anunt) => (
-            <div key={anunt._id} className="card">
-              {anunt.imagini?.length > 0 && (
-                <img src={anunt.imagini[0]} alt={anunt.titlu} />
-              )}
-              <h3>{anunt.titlu}</h3>
-              <p>{anunt.descriere.substring(0, 60)}...</p>
-              <p className="pret">{anunt.pret} €</p>
-              <span className="badge">{anunt.categorie}</span>
-
-              <div style={{ marginTop: "10px" }}>
-                <Link to={`/editare-anunt/${anunt._id}`}>
-                  <BlueButton style={{ width: "100%", marginBottom: "5px" }}>
-                    ✏️ Editează
-                  </BlueButton>
+            <div
+              key={anunt._id}
+              className="bg-white rounded-lg shadow p-3 flex flex-col"
+            >
+              <img
+                src={anunt.imagini?.[0] || "https://via.placeholder.com/400x250"}
+                alt={anunt.titlu}
+                className="w-full h-40 object-cover rounded-lg mb-3"
+              />
+              <h3 className="text-lg font-semibold mb-1 truncate">
+                {anunt.titlu}
+              </h3>
+              <p className="text-blue-600 font-bold mb-3">{anunt.pret} €</p>
+              <div className="mt-auto flex gap-2">
+                <Link
+                  to={`/editare-anunt/${anunt._id}`}
+                  className="flex-1 bg-yellow-400 text-blue-900 text-center py-1 rounded-lg hover:bg-yellow-300"
+                >
+                  Editare
                 </Link>
-
-                <BlueButton
-                  style={{
-                    width: "100%",
-                    marginBottom: "5px",
-                    background: "red",
-                  }}
-                  onClick={() => handleDelete(anunt._id)}
-                >
-                  🗑️ Șterge
-                </BlueButton>
-
-                {/* 🔹 Buton Verde Upgrade */}
                 <button
-                  className="green-btn"
-                  onClick={() => navigate(`/plata/${anunt._id}`)}
+                  onClick={() => handleDelete(anunt._id)}
+                  className="flex-1 bg-red-500 text-white py-1 rounded-lg hover:bg-red-600"
                 >
-                  🚀 Upgrade la Premium
+                  Ștergere
                 </button>
               </div>
             </div>
           ))}
         </div>
+      ) : (
+        <p>Nu ai adăugat niciun anunț încă.</p>
       )}
     </div>
   );
 }
-
-export default AnunturileMele;

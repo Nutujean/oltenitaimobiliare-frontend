@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { MapPin, Home, BedDouble, Tag } from "lucide-react";
 
 export default function AnuntCard({ anunt }) {
   return (
@@ -11,7 +12,15 @@ export default function AnuntCard({ anunt }) {
           className="w-full h-48 object-cover rounded-lg"
         />
         {anunt.pachet && (
-          <span className="absolute top-2 left-2 bg-yellow-400 text-blue-900 text-xs font-semibold px-2 py-1 rounded">
+          <span
+            className={`absolute top-2 left-2 text-xs font-semibold px-2 py-1 rounded ${
+              anunt.pachet === "Gold"
+                ? "bg-yellow-400 text-blue-900"
+                : anunt.pachet === "Diamond"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-300 text-gray-900"
+            }`}
+          >
             {anunt.pachet}
           </span>
         )}
@@ -19,11 +28,28 @@ export default function AnuntCard({ anunt }) {
 
       {/* Conținut */}
       <div className="flex-1 mt-3 flex flex-col">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+        <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
           {anunt.titlu}
         </h3>
-        <p className="text-sm text-gray-600 mb-2">{anunt.locatie}</p>
-        <p className="text-blue-600 font-bold text-lg mb-4">{anunt.pret} €</p>
+        <p className="text-blue-600 font-bold text-xl mb-2">
+          {anunt.pret} €
+        </p>
+
+        {/* Detalii */}
+        <div className="text-sm text-gray-600 space-y-1 mb-4">
+          <p className="flex items-center gap-1">
+            <MapPin size={16} /> {anunt.locatie || "Nespecificat"}
+          </p>
+          <p className="flex items-center gap-1">
+            <Home size={16} /> {anunt.categorie || "N/A"} •{" "}
+            {anunt.tranzactie || "N/A"}
+          </p>
+          {anunt.camere && (
+            <p className="flex items-center gap-1">
+              <BedDouble size={16} /> {anunt.camere} camere
+            </p>
+          )}
+        </div>
 
         {/* Buton Detalii */}
         <Link
