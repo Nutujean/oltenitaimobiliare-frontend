@@ -1,10 +1,9 @@
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -13,43 +12,61 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    navigate("/login");
+    window.location.href = "/";
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-md fixed top-0 w-full z-50">
+    <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* LOGO */}
-          <Link to="/" className="text-xl md:text-2xl font-bold tracking-wide">
-            Oltenita<span className="text-yellow-300">Imobiliare.ro</span>
-          </Link>
+        <div className="flex justify-between h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0 flex items-center">
+            <Link to="/" className="text-xl font-bold text-blue-600">
+              OltenițaImobiliare.ro
+            </Link>
+          </div>
 
-          {/* MENIU DESKTOP */}
-          <div className="hidden md:flex space-x-6 items-center font-medium">
-            <Link to="/" className="hover:text-yellow-300">Acasă</Link>
-            <Link to="/adauga-anunt" className="hover:text-yellow-300">Adaugă Anunț</Link>
-            <Link to="/anunturile-mele" className="hover:text-yellow-300">Anunțurile Mele</Link>
-            <Link to="/contact" className="hover:text-yellow-300">Contact</Link>
+          {/* Meniu desktop */}
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/anunturi" className="text-gray-700 hover:text-blue-600">
+              Anunțuri
+            </Link>
+            <Link to="/adauga-anunt" className="text-gray-700 hover:text-blue-600">
+              Adaugă anunț
+            </Link>
+            <Link to="/contact" className="text-gray-700 hover:text-blue-600">
+              Contact
+            </Link>
+            <Link to="/despre" className="text-gray-700 hover:text-blue-600">
+              Despre noi
+            </Link>
+
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600"
-              >
-                Logout
-              </button>
+              <>
+                <Link
+                  to="/anunturile-mele"
+                  className="text-gray-700 hover:text-blue-600"
+                >
+                  Anunțurile mele
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <>
                 <Link
                   to="/login"
-                  className="bg-white text-blue-600 px-3 py-1 rounded-lg hover:bg-gray-100"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-yellow-400 text-blue-900 px-3 py-1 rounded-lg hover:bg-yellow-300"
+                  className="bg-gray-200 text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-300"
                 >
                   Register
                 </Link>
@@ -57,62 +74,79 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* BUTON HAMBURGER MOBILE */}
-          <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)}>
-              <svg
-                className="h-8 w-8"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
+          {/* Buton meniu mobil */}
+          <div className="flex items-center md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-700 hover:text-blue-600 focus:outline-none"
+            >
+              ☰
             </button>
           </div>
         </div>
       </div>
 
-      {/* MENIU MOBILE */}
+      {/* Meniu mobil */}
       {isOpen && (
-        <div className="md:hidden bg-blue-700 px-4 pt-2 pb-4 space-y-2 font-medium">
-          <Link to="/" className="block hover:text-yellow-300">Acasă</Link>
-          <Link to="/adauga-anunt" className="block hover:text-yellow-300">Adaugă Anunț</Link>
-          <Link to="/anunturile-mele" className="block hover:text-yellow-300">Anunțurile Mele</Link>
-          <Link to="/contact" className="block hover:text-yellow-300">Contact</Link>
+        <div className="md:hidden bg-white px-4 pb-4 space-y-2 shadow">
+          <Link
+            to="/anunturi"
+            className="block text-gray-700 hover:text-blue-600"
+            onClick={() => setIsOpen(false)}
+          >
+            Anunțuri
+          </Link>
+          <Link
+            to="/adauga-anunt"
+            className="block text-gray-700 hover:text-blue-600"
+            onClick={() => setIsOpen(false)}
+          >
+            Adaugă anunț
+          </Link>
+          <Link
+            to="/contact"
+            className="block text-gray-700 hover:text-blue-600"
+            onClick={() => setIsOpen(false)}
+          >
+            Contact
+          </Link>
+          <Link
+            to="/despre"
+            className="block text-gray-700 hover:text-blue-600"
+            onClick={() => setIsOpen(false)}
+          >
+            Despre noi
+          </Link>
+
           {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="block w-full text-left bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600"
-            >
-              Logout
-            </button>
+            <>
+              <Link
+                to="/anunturile-mele"
+                className="block text-gray-700 hover:text-blue-600"
+                onClick={() => setIsOpen(false)}
+              >
+                Anunțurile mele
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Link
                 to="/login"
-                className="block bg-white text-blue-600 px-3 py-1 rounded-lg hover:bg-gray-100"
+                className="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                onClick={() => setIsOpen(false)}
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="block bg-yellow-400 text-blue-900 px-3 py-1 rounded-lg hover:bg-yellow-300"
+                className="block bg-gray-200 text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-300"
+                onClick={() => setIsOpen(false)}
               >
                 Register
               </Link>

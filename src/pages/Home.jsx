@@ -1,114 +1,140 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import AnuntCard from "../components/AnuntCard";
+import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [locatie, setLocatie] = useState("");
-  const [tip, setTip] = useState("");
-  const [camere, setCamere] = useState("");
   const [anunturi, setAnunturi] = useState([]);
-  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [categorie, setCategorie] = useState("");
+  const [camere, setCamere] = useState("");
+  const [pretMin, setPretMin] = useState("");
+  const [pretMax, setPretMax] = useState("");
+  const [sortare, setSortare] = useState("");
 
-  const handleSearch = () => {
-    const query = new URLSearchParams();
-    if (locatie) query.append("locatie", locatie);
-    if (tip) query.append("categorie", tip);
-    if (camere) query.append("camere", camere);
-    navigate(`/anunturi?${query.toString()}`);
+  useEffect(() => {
+    fetchAnunturi();
+  }, [search, categorie, camere, pretMin, pretMax, sortare]);
+
+  const fetchAnunturi = async () => {
+    try {
+      let url = "https://imobila-market-backend.onrender.com/api/anunturi?";
+
+      if (search) url += `search=${search}&`;
+      if (categorie) url += `categorie=${categorie}&`;
+      if (camere) url += `camere=${camere}&`;
+      if (pretMin) url += `pretMin=${pretMin}&`;
+      if (pretMax) url += `pretMax=${pretMax}&`;
+      if (sortare) url += `sort=${sortare}&`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      setAnunturi(data);
+    } catch (err) {
+      console.error("Eroare la încărcarea anunțurilor:", err);
+    }
   };
 
   return (
-    <div>
-      {/* HERO */}
-      <section
-        className="relative h-72 md:h-96 flex items-center justify-center text-center text-white"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1560185127-6ed189bf02d2?auto=format&fit=crop&w=1600&q=80')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-blue-800/60"></div>
-        <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Anunțuri imobiliare în Oltenița
-          </h1>
-          <p className="text-lg mb-6">
-            Găsește cele mai bune oferte de vânzare, cumpărare și închiriere
-          </p>
-          <Link
-            to="/anunturi"
-            className="bg-yellow-400 text-blue-900 px-6 py-2 rounded-lg font-semibold hover:bg-yellow-300 inline-block"
-          >
-            Vezi oferte
-          </Link>
-        </div>
-      </section>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Formular filtre */}
+      <div className="bg-white shadow-md rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
+        {/* Căutare */}
+        <input
+          type="text"
+          placeholder="Caută..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        />
 
-      {/* BARA DE CĂUTARE RAPIDĂ */}
-      <div className="max-w-4xl mx-auto -mt-10 bg-white shadow-lg rounded-lg p-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Locație */}
+        {/* Categorie */}
+        <select
+          value={categorie}
+          onChange={(e) => setCategorie(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        >
+          <option value="">Toate categoriile</option>
+          <option value="apartament">Apartamente</option>
+          <option value="casa">Case</option>
+          <option value="teren">Terenuri</option>
+          <option value="garaj">Garaje</option>
+          <option value="spatiu_comercial">Spațiu comercial</option>
+        </select>
+
+        {/* Camere */}
+        <select
+          value={camere}
+          onChange={(e) => setCamere(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        >
+          <option value="">Toate</option>
+          <option value="garsoniera">Garsonieră</option>
+          <option value="2">2 camere</option>
+          <option value="3">3 camere</option>
+          <option value="4">4 camere</option>
+        </select>
+
+        {/* Preț min/max */}
+        <div className="flex gap-2">
           <input
-            type="text"
-            placeholder="Introdu locația..."
-            value={locatie}
-            onChange={(e) => setLocatie(e.target.value)}
-            className="border rounded-lg px-3 py-2 w-full"
+            type="number"
+            placeholder="Preț min"
+            value={pretMin}
+            onChange={(e) => setPretMin(e.target.value)}
+            className="border rounded px-2 py-1 w-full"
           />
-
-          {/* Tip imobil */}
-          <select
-            value={tip}
-            onChange={(e) => setTip(e.target.value)}
-            className="border rounded-lg px-3 py-2 w-full"
-          >
-            <option value="">Tip imobil</option>
-            <option value="apartament">Apartament</option>
-            <option value="casa">Casă / Vilă</option>
-            <option value="teren">Teren</option>
-            <option value="garaj">Garaj</option>
-          </select>
-
-          {/* Camere */}
-          <select
-            value={camere}
-            onChange={(e) => setCamere(e.target.value)}
-            className="border rounded-lg px-3 py-2 w-full"
-          >
-            <option value="">Nr. camere</option>
-            <option value="1">1 cameră</option>
-            <option value="2">2 camere</option>
-            <option value="3">3 camere</option>
-            <option value="4+">4+ camere</option>
-          </select>
-
-          {/* Buton căutare */}
-          <button
-            onClick={handleSearch}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 w-full"
-          >
-            Caută
-          </button>
+          <input
+            type="number"
+            placeholder="Preț max"
+            value={pretMax}
+            onChange={(e) => setPretMax(e.target.value)}
+            className="border rounded px-2 py-1 w-full"
+          />
         </div>
+
+        {/* Sortare */}
+        <select
+          value={sortare}
+          onChange={(e) => setSortare(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        >
+          <option value="">Sortează după</option>
+          <option value="newest">Cele mai noi</option>
+          <option value="asc">Preț crescător</option>
+          <option value="desc">Preț descrescător</option>
+        </select>
       </div>
 
-      {/* ANUNȚURI RECENTE */}
-      <section className="max-w-6xl mx-auto px-4 py-10">
-        <h2 className="text-2xl font-bold mb-6">📢 Anunțuri recente</h2>
+      {/* Listă anunțuri */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {anunturi.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {anunturi.map((anunt) => (
-              <AnuntCard key={anunt._id} anunt={anunt} />
-            ))}
-          </div>
+          anunturi.map((anunt) => (
+            <div
+              key={anunt._id}
+              className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden"
+            >
+              <img
+                src={
+                  anunt.imagini?.[0] ||
+                  "https://via.placeholder.com/400x250?text=Fără+imagine"
+                }
+                alt={anunt.titlu}
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold">{anunt.titlu}</h3>
+                <p className="text-gray-600 text-sm truncate">
+                  {anunt.descriere}
+                </p>
+                <p className="font-bold text-blue-600 mt-2">{anunt.pret} €</p>
+                <p className="text-xs text-gray-500">{anunt.categorie}</p>
+              </div>
+            </div>
+          ))
         ) : (
-          <p className="text-gray-600">
-            Nu există anunțuri momentan sau se încarcă...
+          <p className="col-span-full text-center text-gray-500">
+            Nu am găsit anunțuri.
           </p>
         )}
-      </section>
+      </div>
     </div>
   );
 }
