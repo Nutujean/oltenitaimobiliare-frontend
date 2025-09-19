@@ -3,170 +3,135 @@ import { useNavigate } from "react-router-dom";
 
 export default function AdaugaAnunt() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     titlu: "",
     descriere: "",
     pret: "",
-    locatie: "",
     categorie: "",
-    tranzactie: "",
-    camere: "",
-    imagini: [],
+    tranzactie: "Vanzare",
   });
+  const [imagini, setImagini] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "imagini") {
-      setFormData({ ...formData, imagini: files });
+  const handleImageChange = (e) => {
+    if (e.target.files.length > 15) {
+      alert("Poți încărca maximum 15 imagini!");
+      e.target.value = null;
     } else {
-      setFormData({ ...formData, [name]: value });
+      setImagini([...e.target.files]);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Trebuie să fii logat pentru a adăuga un anunț.");
+      alert("Trebuie să fii logat pentru a adăuga un anunț!");
       navigate("/login");
       return;
     }
 
     try {
-      const data = new FormData();
-      for (const key in formData) {
-        if (key === "imagini") {
-          for (let i = 0; i < formData.imagini.length; i++) {
-            data.append("imagini", formData.imagini[i]);
-          }
-        } else {
-          data.append(key, formData[key]);
-        }
-      }
+      const formData = new FormData();
+      formData.append("titlu", form.titlu);
+      formData.append("descriere", form.descriere);
+      formData.append("pret", form.pret);
+      formData.append("categorie", form.categorie);
+      formData.append("tranzactie", form.tranzactie);
+
+      imagini.forEach((img) => {
+        formData.append("imagini", img);
+      });
 
       const res = await fetch(
         "https://imobila-market-backend.onrender.com/api/anunturi",
         {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: data,
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
         }
       );
 
-      if (res.ok) {
-        alert("Anunț adăugat cu succes!");
-        navigate("/anunturile-mele");
-      } else {
-        const err = await res.json();
-        alert("Eroare: " + err.message);
-      }
-    } catch (error) {
-      console.error("Eroare la adăugare anunț:", error);
-      alert("A apărut o eroare la server.");
+      if (!res.ok) throw new Error("Eroare la adăugarea anunțului");
+      await res.json();
+
+      alert("Anunț adăugat cu succes!");
+      navigate("/");
+    } catch (err) {
+      alert("Eroare: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold mb-6">➕ Adaugă un anunț</h1>
-
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow mt-10">
+      <h1 className="text-2xl font-bold mb-6">Adaugă anunț nou</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          name="titlu"
-          placeholder="Titlu anunț"
-          value={formData.titlu}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          placeholder="Titlu"
+          value={form.titlu}
+          onChange={(e) => setForm({ ...form, titlu: e.target.value })}
+          className="w-full border rounded px-3 py-2"
           required
         />
-
         <textarea
-          name="descriere"
           placeholder="Descriere"
-          value={formData.descriere}
-          onChange={handleChange}
-          rows="5"
-          className="w-full border rounded-lg px-3 py-2"
+          value={form.descriere}
+          onChange={(e) => setForm({ ...form, descriere: e.target.value })}
+          className="w-full border rounded px-3 py-2 h-32"
           required
-        ></textarea>
-
+        />
         <input
           type="number"
-          name="pret"
           placeholder="Preț (€)"
-          value={formData.pret}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        />
-
-        <input
-          type="text"
-          name="locatie"
-          placeholder="Locație"
-          value={formData.locatie}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          value={form.pret}
+          onChange={(e) => setForm({ ...form, pret: e.target.value })}
+          className="w-full border rounded px-3 py-2"
           required
         />
 
         <select
-          name="categorie"
-          value={formData.categorie}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          value={form.categorie}
+          onChange={(e) => setForm({ ...form, categorie: e.target.value })}
+          className="w-full border rounded px-3 py-2"
           required
         >
-          <option value="">Categorie</option>
-          <option value="apartament">Apartament</option>
-          <option value="casa">Casă / Vilă</option>
-          <option value="teren">Teren</option>
-          <option value="garaj">Garaj</option>
+          <option value="">Alege categorie</option>
+          <option>Apartament</option>
+          <option>Garsoniere</option> {/* 🔹 adăugat */}
+          <option>Casă</option>
+          <option>Teren</option>
+          <option>Garaj</option>
+          <option>Spațiu comercial</option>
         </select>
 
         <select
-          name="tranzactie"
-          value={formData.tranzactie}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
+          value={form.tranzactie}
+          onChange={(e) => setForm({ ...form, tranzactie: e.target.value })}
+          className="w-full border rounded px-3 py-2"
         >
-          <option value="">Tip tranzacție</option>
-          <option value="vanzare">Vânzare</option>
-          <option value="inchiriere">Închiriere</option>
-        </select>
-
-        <select
-          name="camere"
-          value={formData.camere}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-        >
-          <option value="">Nr. camere</option>
-          <option value="1">1 cameră</option>
-          <option value="2">2 camere</option>
-          <option value="3">3 camere</option>
-          <option value="4+">4+ camere</option>
+          <option>Vanzare</option>
+          <option>Inchiriere</option>
         </select>
 
         <input
           type="file"
-          name="imagini"
           multiple
           accept="image/*"
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
+          onChange={handleImageChange}
+          className="w-full border rounded px-3 py-2"
         />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+          disabled={loading}
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
         >
-          Adaugă anunț
+          {loading ? "Se adaugă..." : "Adaugă anunț"}
         </button>
       </form>
     </div>

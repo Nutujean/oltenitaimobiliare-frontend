@@ -1,155 +1,151 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
+  const token = localStorage.getItem("token");
+
+  // fix pentru JSON.parse undefined
+  let user = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && storedUser !== "undefined") {
+      user = JSON.parse(storedUser);
+    }
+  } catch (err) {
+    console.error("Eroare la citirea userului din localStorage", err);
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/";
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   return (
-    <nav className="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-xl font-bold text-blue-600">
-              OltenițaImobiliare.ro
-            </Link>
-          </div>
+    <nav className="bg-blue-600 text-white shadow-md fixed w-full z-50">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-bold">
+          Oltenița Imobiliare
+        </Link>
 
-          {/* Meniu desktop */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link to="/anunturi" className="text-gray-700 hover:text-blue-600">
-              Anunțuri
-            </Link>
-            <Link to="/adauga-anunt" className="text-gray-700 hover:text-blue-600">
-              Adaugă anunț
-            </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-blue-600">
-              Contact
-            </Link>
-            <Link to="/despre" className="text-gray-700 hover:text-blue-600">
-              Despre noi
-            </Link>
+        {/* Buton hamburger (mobil) */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-white focus:outline-none"
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
 
-            {isLoggedIn ? (
-              <>
-                <Link
-                  to="/anunturile-mele"
-                  className="text-gray-700 hover:text-blue-600"
-                >
-                  Anunțurile mele
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-gray-200 text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-300"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Buton meniu mobil */}
-          <div className="flex items-center md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-blue-600 focus:outline-none"
-            >
-              ☰
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Meniu mobil */}
-      {isOpen && (
-        <div className="md:hidden bg-white px-4 pb-4 space-y-2 shadow">
+        {/* Meniu desktop */}
+        <div className="hidden md:flex space-x-3 items-center">
           <Link
-            to="/anunturi"
-            className="block text-gray-700 hover:text-blue-600"
-            onClick={() => setIsOpen(false)}
+            to="/"
+            className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
           >
-            Anunțuri
+            Acasă
           </Link>
           <Link
-            to="/adauga-anunt"
-            className="block text-gray-700 hover:text-blue-600"
-            onClick={() => setIsOpen(false)}
+            to="/adauga"
+            className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
           >
             Adaugă anunț
           </Link>
-          <Link
-            to="/contact"
-            className="block text-gray-700 hover:text-blue-600"
-            onClick={() => setIsOpen(false)}
-          >
-            Contact
-          </Link>
-          <Link
-            to="/despre"
-            className="block text-gray-700 hover:text-blue-600"
-            onClick={() => setIsOpen(false)}
-          >
-            Despre noi
-          </Link>
-
-          {isLoggedIn ? (
-            <>
-              <Link
-                to="/anunturile-mele"
-                className="block text-gray-700 hover:text-blue-600"
-                onClick={() => setIsOpen(false)}
-              >
-                Anunțurile mele
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
+          {token && (
+            <Link
+              to="/anunturile-mele"
+              className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+            >
+              Anunțurile mele
+            </Link>
+          )}
+          {!token ? (
             <>
               <Link
                 to="/login"
-                className="block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                onClick={() => setIsOpen(false)}
+                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="block bg-gray-200 text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-300"
-                onClick={() => setIsOpen(false)}
+                className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
               >
                 Register
               </Link>
+            </>
+          ) : (
+            <>
+              <span className="font-semibold">{user?.nume || user?.email}</span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Meniu mobil */}
+      {menuOpen && (
+        <div className="md:hidden bg-blue-700 px-4 py-3 space-y-2">
+          <Link
+            to="/"
+            className="block bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+            onClick={() => setMenuOpen(false)}
+          >
+            Acasă
+          </Link>
+          <Link
+            to="/adauga"
+            className="block bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+            onClick={() => setMenuOpen(false)}
+          >
+            Adaugă anunț
+          </Link>
+          {token && (
+            <Link
+              to="/anunturile-mele"
+              className="block bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+              onClick={() => setMenuOpen(false)}
+            >
+              Anunțurile mele
+            </Link>
+          )}
+          {!token ? (
+            <>
+              <Link
+                to="/login"
+                className="block bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="block bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-200 transition"
+                onClick={() => setMenuOpen(false)}
+              >
+                Register
+              </Link>
+            </>
+          ) : (
+            <>
+              <span className="block font-semibold">{user?.nume || user?.email}</span>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
             </>
           )}
         </div>
