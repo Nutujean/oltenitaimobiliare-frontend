@@ -1,10 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import BlueButton from "../components/BlueButton";
+
+const PLACEHOLDER = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
+    <rect width="100%" height="100%" fill="#e5e7eb"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#6b7280" font-size="22" font-family="Arial, Helvetica, sans-serif">
+      Fără imagine
+    </text>
+  </svg>`
+)}`;
+
+function resolveImg(src, backendBase) {
+  if (!src) return PLACEHOLDER;
+  if (/^https?:\/\//i.test(src)) return src; // Cloudinary sau alt URL absolut
+  const path = src.startsWith("/") ? src : `/${src}`;
+  return `${backendBase}${path}`;
+}
 
 function Home() {
   const [anunturi, setAnunturi] = useState([]);
   const [error, setError] = useState("");
+
+  const backendBase = useMemo(() => {
+    const b = import.meta.env.VITE_BACKEND_URL || "";
+    return b.endsWith("/") ? b.slice(0, -1) : b;
+  }, []);
 
   useEffect(() => {
     const fetchAnunturi = async () => {
@@ -14,13 +35,11 @@ function Home() {
         );
         const data = await response.json();
         if (response.ok) {
-          // 🔹 Sortează: Diamond > Gold > restul
-          const sorted = data.sort((a, b) => {
-            if (a.pachet === "Diamond" && b.pachet !== "Diamond") return -1;
-            if (b.pachet === "Diamond" && a.pachet !== "Diamond") return 1;
-            if (a.pachet === "Gold" && b.pachet === "Basic") return -1;
-            if (b.pachet === "Gold" && a.pachet === "Basic") return 1;
-            return 0;
+          // Diamond > Gold > restul
+          const sorted = [...data].sort((a, b) => {
+            const rank = (p) =>
+              p === "Diamond" ? 2 : p === "Gold" ? 1 : 0;
+            return rank(b.pachet) - rank(a.pachet);
           });
           setAnunturi(sorted);
         } else {
@@ -35,55 +54,64 @@ function Home() {
 
   return (
     <div>
-      {/* ===== Hero Section ===== */}
+      {/* ===== Hero ===== */}
       <section className="hero">
         <div className="hero-content">
           <h1>Anunțuri imobiliare în Oltenița</h1>
           <p>Găsește cele mai bune oferte de vânzare, cumpărare și închiriere</p>
-          <BlueButton style={{ marginTop: "15px" }}>Vezi oferte</BlueButton>
+          <BlueButton style={{ marginTop: 15 }}>Vezi oferte</BlueButton>
         </div>
       </section>
 
-      {/* ===== Lista Anunțuri ===== */}
+      {/* ===== Lista anunțuri ===== */}
       <div className="container">
         <h2>📢 Anunțuri recente</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         <div className="grid">
-          {anunturi.map((anunt) => (
-            <div
-              key={anunt._id}
-              className={`card ${
-                anunt.pachet === "Diamond"
-                  ? "card-diamond"
-                  : anunt.pachet === "Gold"
-                  ? "card-gold"
-                  : ""
-              }`}
-            >
-              {anunt.imagini?.length > 0 && (
-                <img src={anunt.imagini[0]} alt={anunt.titlu} />
-              )}
-              <h3>{anunt.titlu}</h3>
-              <p>{anunt.descriere.substring(0, 80)}...</p>
-              <p className="pret">{anunt.pret} €</p>
-              <span className="badge">{anunt.categorie}</span>
+          {anunturi.map((anunt) => {
+            const first = anunt.imagini?.[0];
+            const imgUrl = resolveImg(first, backendBase);
 
-              {/* 🔹 Badge Premium */}
-              {anunt.pachet === "Gold" && (
-                <span className="badge-gold">⭐ Gold</span>
-              )}
-              {anunt.pachet === "Diamond" && (
-                <span className="badge-diamond">💎 Diamond</span>
-              )}
+            return (
+              <div
+                key={anunt._id}
+                className={`card ${
+                  anunt.pachet === "Diamond"
+                    ? "card-diamond"
+                    : anunt.pachet === "Gold"
+                    ? "card-gold"
+                    : ""
+                }`}
+              >
+                <img
+                  src={imgUrl}
+                  alt={anunt.titlu}
+                  onError={(e) => {
+                    e.currentTarget.src = PLACEHOLDER;
+                  }}
+                />
 
-              <Link to={`/anunt/${anunt._id}`}>
-                <BlueButton style={{ marginTop: "10px", width: "100%" }}>
-                  📄 Detalii
-                </BlueButton>
-              </Link>
-            </div>
-          ))}
+                <h3>{anunt.titlu}</h3>
+                <p>{(anunt.descriere || "").substring(0, 80)}...</p>
+                <p className="pret">{anunt.pret} €</p>
+                <span className="badge">{anunt.categorie}</span>
+
+                {anunt.pachet === "Gold" && (
+                  <span className="badge-gold">⭐ Gold</span>
+                )}
+                {anunt.pachet === "Diamond" && (
+                  <span className="badge-diamond">💎 Diamond</span>
+                )}
+
+                <Link to={`/anunt/${anunt._id}`}>
+                  <BlueButton style={{ marginTop: 10, width: "100%" }}>
+                    📄 Detalii
+                  </BlueButton>
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

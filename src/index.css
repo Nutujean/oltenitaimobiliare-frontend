@@ -255,3 +255,8 @@ body {
 .footer-links li a:hover {
   text-decoration: underline;
 }
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
