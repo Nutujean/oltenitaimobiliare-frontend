@@ -1,3 +1,3 @@
-git add .
-git commit -m "frontend conectat la backend corect"
-git push
+// src/api.js
+const API_URL = "https://oltenitaimobiliare-backend.onrender.com";
+export default API_URL;
