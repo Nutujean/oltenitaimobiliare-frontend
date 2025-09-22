@@ -1,46 +1,27 @@
 import React, { useState } from "react";
-import API_URL from "./api";
+import API_URL from "../api";
 
 export default function AdaugaAnunt() {
   const [titlu, setTitlu] = useState("");
   const [descriere, setDescriere] = useState("");
   const [pret, setPret] = useState("");
   const [categorie, setCategorie] = useState("");
-  const [imagini, setImagini] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("titlu", titlu);
-    formData.append("descriere", descriere);
-    formData.append("pret", pret);
-    formData.append("categorie", categorie);
-
-    for (let i = 0; i < imagini.length; i++) {
-      formData.append("imagini", imagini[i]);
-    }
-
     try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        alert("Trebuie să fii logat pentru a adăuga un anunț.");
-        return;
-      }
-
       const res = await fetch(`${API_URL}/api/anunturi`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ trimitem tokenul
+          "Content-Type": "application/json",
         },
-        body: formData,
+        body: JSON.stringify({ titlu, descriere, pret, categorie }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        console.error("❌ Eroare backend:", data);
         alert(data.error || "Eroare la adăugarea anunțului");
         return;
       }
@@ -53,7 +34,6 @@ export default function AdaugaAnunt() {
       setDescriere("");
       setPret("");
       setCategorie("");
-      setImagini([]);
     } catch (err) {
       console.error("❌ Eroare fetch:", err);
       alert("Eroare de rețea la adăugarea anunțului");
@@ -105,13 +85,6 @@ export default function AdaugaAnunt() {
         <option value="Garaje">Garaje</option>
         <option value="Spațiu comercial">Spațiu comercial</option>
       </select>
-
-      <input
-        type="file"
-        multiple
-        onChange={(e) => setImagini(e.target.files)}
-        className="w-full"
-      />
 
       <button
         type="submit"
