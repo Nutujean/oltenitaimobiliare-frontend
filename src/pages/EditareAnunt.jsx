@@ -1,198 +1,142 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import API_URL from "../api";
 
 export default function EditareAnunt() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    titlu: "",
-    descriere: "",
-    pret: "",
-    locatie: "",
-    categorie: "",
-    tranzactie: "",
-    camere: "",
-    imagini: [],
-  });
+
+  const [titlu, setTitlu] = useState("");
+  const [descriere, setDescriere] = useState("");
+  const [pret, setPret] = useState("");
+  const [categorie, setCategorie] = useState("");
+  const [imaginiExistente, setImaginiExistente] = useState([]);
+  const [imaginiNoi, setImaginiNoi] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    const fetchAnunt = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/anunturi/${id}`);
+        const data = await res.json();
+        setTitlu(data.titlu);
+        setDescriere(data.descriere);
+        setPret(data.pret);
+        setCategorie(data.categorie);
+        setImaginiExistente(data.imagini || []);
+      } catch (err) {
+        console.error("❌ Eroare la încărcarea anunțului:", err);
+      }
+    };
+    fetchAnunt();
+  }, [id]);
 
-    fetch(`https://imobila-market-backend.onrender.com/api/anunturi/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setFormData({
-          titlu: data.titlu,
-          descriere: data.descriere,
-          pret: data.pret,
-          locatie: data.locatie,
-          categorie: data.categorie,
-          tranzactie: data.tranzactie,
-          camere: data.camere,
-          imagini: [],
-        });
-      })
-      .catch((err) => console.error("Eroare la încărcare anunț:", err));
-  }, [id, navigate]);
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "imagini") {
-      setFormData({ ...formData, imagini: files });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+  const handleStergeImagine = (img) => {
+    setImaginiExistente((prev) => prev.filter((i) => i !== img));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Trebuie să fii logat.");
-      return;
+    const formData = new FormData();
+    formData.append("titlu", titlu);
+    formData.append("descriere", descriere);
+    formData.append("pret", pret);
+    formData.append("categorie", categorie);
+    formData.append("imaginiExistente", JSON.stringify(imaginiExistente));
+
+    for (let i = 0; i < imaginiNoi.length; i++) {
+      formData.append("imagini", imaginiNoi[i]);
     }
 
     try {
-      const data = new FormData();
-      for (const key in formData) {
-        if (key === "imagini") {
-          for (let i = 0; i < formData.imagini.length; i++) {
-            data.append("imagini", formData.imagini[i]);
-          }
-        } else {
-          data.append(key, formData[key]);
-        }
-      }
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/anunturi/${id}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
 
-      const res = await fetch(
-        `https://imobila-market-backend.onrender.com/api/anunturi/${id}`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-          body: data,
-        }
-      );
+      if (!res.ok) throw new Error("Eroare la editare");
 
-      if (res.ok) {
-        alert("Anunț actualizat cu succes!");
-        navigate("/anunturile-mele");
-      } else {
-        const err = await res.json();
-        alert("Eroare: " + err.message);
-      }
-    } catch (error) {
-      console.error("Eroare la actualizare:", error);
-      alert("A apărut o eroare la server.");
+      alert("✅ Anunț actualizat cu succes!");
+      navigate("/anunturile-mele");
+    } catch (err) {
+      console.error("❌", err);
+      alert("Eroare la actualizare!");
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold mb-6">✏️ Editare Anunț</h1>
+    <form onSubmit={handleSubmit} className="p-6 max-w-lg mx-auto space-y-3 bg-white rounded-lg shadow">
+      <h1 className="text-xl font-bold">✏️ Editează anunțul</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="titlu"
-          placeholder="Titlu anunț"
-          value={formData.titlu}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        />
+      <input
+        type="text"
+        placeholder="Titlu"
+        value={titlu}
+        onChange={(e) => setTitlu(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
 
-        <textarea
-          name="descriere"
-          placeholder="Descriere"
-          value={formData.descriere}
-          onChange={handleChange}
-          rows="5"
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        ></textarea>
+      <textarea
+        placeholder="Descriere"
+        value={descriere}
+        onChange={(e) => setDescriere(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
 
-        <input
-          type="number"
-          name="pret"
-          placeholder="Preț (€)"
-          value={formData.pret}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        />
+      <input
+        type="number"
+        placeholder="Preț"
+        value={pret}
+        onChange={(e) => setPret(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
 
-        <input
-          type="text"
-          name="locatie"
-          placeholder="Locație"
-          value={formData.locatie}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        />
+      <input
+        type="text"
+        placeholder="Categorie"
+        value={categorie}
+        onChange={(e) => setCategorie(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
 
-        <select
-          name="categorie"
-          value={formData.categorie}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        >
-          <option value="">Categorie</option>
-          <option value="apartament">Apartament</option>
-          <option value="casa">Casă / Vilă</option>
-          <option value="teren">Teren</option>
-          <option value="garaj">Garaj</option>
-        </select>
+      {/* Imagini existente */}
+      {imaginiExistente.length > 0 && (
+        <div className="space-y-2">
+          <p className="font-semibold">Imagini existente:</p>
+          <div className="grid grid-cols-2 gap-3">
+            {imaginiExistente.map((img, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={`http://localhost:5000${img}`}
+                  alt={`Imagine ${index}`}
+                  className="w-full h-32 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleStergeImagine(img)}
+                  className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-        <select
-          name="tranzactie"
-          value={formData.tranzactie}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-          required
-        >
-          <option value="">Tip tranzacție</option>
-          <option value="vanzare">Vânzare</option>
-          <option value="inchiriere">Închiriere</option>
-        </select>
+      {/* Upload imagini noi */}
+      <input
+        type="file"
+        multiple
+        onChange={(e) => setImaginiNoi(e.target.files)}
+        className="w-full"
+      />
 
-        <select
-          name="camere"
-          value={formData.camere}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-        >
-          <option value="">Nr. camere</option>
-          <option value="1">1 cameră</option>
-          <option value="2">2 camere</option>
-          <option value="3">3 camere</option>
-          <option value="4+">4+ camere</option>
-        </select>
-
-        <input
-          type="file"
-          name="imagini"
-          multiple
-          accept="image/*"
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2"
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-        >
-          Salvează modificările
-        </button>
-      </form>
-    </div>
+      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        Salvează modificările
+      </button>
+    </form>
   );
 }

@@ -1,87 +1,77 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import API_URL from "./api";
 
 export default function AnunturileMele() {
   const [anunturi, setAnunturi] = useState([]);
-  const navigate = useNavigate();
 
+  // La montare, încărcăm anunțurile userului
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    fetch("https://imobila-market-backend.onrender.com/api/anunturile-mele", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => setAnunturi(data))
-      .catch((err) => console.error("Eroare la încărcare:", err));
-  }, [navigate]);
-
-  const handleDelete = async (id) => {
-    const confirm = window.confirm("Sigur vrei să ștergi acest anunț?");
-    if (!confirm) return;
-
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(
-        `https://imobila-market-backend.onrender.com/api/anunturi/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (res.ok) {
-        setAnunturi(anunturi.filter((a) => a._id !== id));
-      } else {
-        alert("Eroare la ștergere");
+    const fetchAnunturi = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/anunturi`);
+        const data = await res.json();
+        setAnunturi(data);
+      } catch (err) {
+        console.error("❌ Eroare la încărcarea anunțurilor:", err);
       }
+    };
+    fetchAnunturi();
+  }, []);
+
+  // Funcția de ștergere
+  const handleDelete = async (id) => {
+    if (!window.confirm("Sigur vrei să ștergi acest anunț?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/anunturi/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ trimitem token
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("❌ Eroare la ștergere:", data);
+        alert(data.error || "Eroare la ștergerea anunțului");
+        return;
+      }
+
+      alert("✅ Anunț șters cu succes!");
+      setAnunturi(anunturi.filter((a) => a._id !== id)); // scoatem din listă
     } catch (err) {
-      console.error(err);
-      alert("Eroare la server");
+      console.error("❌ Eroare fetch:", err);
+      alert("Eroare de rețea la ștergere");
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold mb-6">📂 Anunțurile mele</h1>
-      {anunturi.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {anunturi.map((anunt) => (
-            <div
-              key={anunt._id}
-              className="bg-white rounded-lg shadow p-3 flex flex-col"
-            >
-              <img
-                src={anunt.imagini?.[0] || "https://via.placeholder.com/400x250"}
-                alt={anunt.titlu}
-                className="w-full h-40 object-cover rounded-lg mb-3"
-              />
-              <h3 className="text-lg font-semibold mb-1 truncate">
-                {anunt.titlu}
-              </h3>
-              <p className="text-blue-600 font-bold mb-3">{anunt.pret} €</p>
-              <div className="mt-auto flex gap-2">
-                <Link
-                  to={`/editare-anunt/${anunt._id}`}
-                  className="flex-1 bg-yellow-400 text-blue-900 text-center py-1 rounded-lg hover:bg-yellow-300"
-                >
-                  Editare
-                </Link>
-                <button
-                  onClick={() => handleDelete(anunt._id)}
-                  className="flex-1 bg-red-500 text-white py-1 rounded-lg hover:bg-red-600"
-                >
-                  Ștergere
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="p-4 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Anunțurile Mele</h1>
+      {anunturi.length === 0 ? (
+        <p>Nu ai anunțuri încă.</p>
       ) : (
-        <p>Nu ai adăugat niciun anunț încă.</p>
+        <ul className="space-y-4">
+          {anunturi.map((anunt) => (
+            <li
+              key={anunt._id}
+              className="border p-3 rounded flex justify-between items-center"
+            >
+              <div>
+                <h2 className="font-semibold">{anunt.titlu}</h2>
+                <p className="text-gray-600">{anunt.pret} €</p>
+              </div>
+              <button
+                onClick={() => handleDelete(anunt._id)}
+                className="bg-red-600 text-white px-3 py-1 rounded"
+              >
+                Șterge
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

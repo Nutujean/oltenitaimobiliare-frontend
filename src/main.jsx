@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import "./index.css"; // Tailwind se aplică aici
+import App from "./App";
+import "./index.css"; // pentru Tailwind sau stiluri globale
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

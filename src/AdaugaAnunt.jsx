@@ -16,13 +16,13 @@ export default function AdaugaAnunt() {
     formData.append("descriere", descriere);
     formData.append("pret", pret);
     formData.append("categorie", categorie);
-
     for (let i = 0; i < imagini.length; i++) {
       formData.append("imagini", imagini[i]);
     }
 
     try {
       const token = localStorage.getItem("token");
+      console.log("👉 Token folosit:", token);
 
       if (!token) {
         alert("Trebuie să fii logat pentru a adăuga un anunț.");
@@ -32,12 +32,14 @@ export default function AdaugaAnunt() {
       const res = await fetch(`${API_URL}/api/anunturi`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ trimitem tokenul
+          Authorization: `Bearer ${token}`, // ✅ DOAR tokenul
         },
         body: formData,
       });
 
+      console.log("👉 Status răspuns:", res.status);
       const data = await res.json();
+      console.log("👉 Răspuns complet backend:", data);
 
       if (!res.ok) {
         console.error("❌ Eroare backend:", data);

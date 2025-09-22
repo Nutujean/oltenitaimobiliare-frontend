@@ -2,7 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stiluri custom globale */
-body {
-  @apply bg-gray-50 text-gray-900;
+/* ===== Hero Section ===== */
+.hero {
+  @apply h-80 flex items-center justify-center text-white bg-cover bg-center relative;
+}
+
+.hero h1 {
+  @apply text-4xl md:text-5xl font-bold drop-shadow-lg;
+}
+
+/* ===== Bara de căutare / filtre ===== */
+.search-bar {
+  @apply p-6 bg-gray-100 shadow-md -mt-10 mx-4 rounded-lg relative z-10;
+}
+
+.search-bar input,
+.search-bar select {
+  @apply border p-2 rounded w-full;
+}
+
+/* ===== Card anunț ===== */
+.anunt-card {
+  @apply border rounded-lg shadow hover:shadow-lg transition bg-white overflow-hidden;
+}
+
+.anunt-card img {
+  @apply w-full h-48 object-cover;
+}
+
+.anunt-card .content {
+  @apply p-4;
+}
+
+.anunt-card h2 {
+  @apply font-bold text-lg;
+}
+
+.anunt-card p {
+  @apply text-gray-600 truncate;
+}
+
+.anunt-card .pret {
+  @apply mt-2 font-bold text-blue-600;
+}
+
+.anunt-card .categorie {
+  @apply text-sm text-gray-500;
 }
