@@ -1,77 +1,111 @@
 import React, { useEffect, useState } from "react";
-import API_URL from "./api";
+import API_URL from "../api";
 
 export default function AnunturileMele() {
   const [anunturi, setAnunturi] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // La montare, încărcăm anunțurile userului
-  useEffect(() => {
-    const fetchAnunturi = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/anunturi`);
-        const data = await res.json();
-        setAnunturi(data);
-      } catch (err) {
-        console.error("❌ Eroare la încărcarea anunțurilor:", err);
-      }
-    };
-    fetchAnunturi();
-  }, []);
+  const token = localStorage.getItem("token");
 
-  // Funcția de ștergere
-  const handleDelete = async (id) => {
-    if (!window.confirm("Sigur vrei să ștergi acest anunț?")) return;
-
+  // 📌 încărcăm anunțurile utilizatorului
+  const fetchAnunturileMele = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_URL}/api/anunturi/${id}`, {
-        method: "DELETE",
+      const res = await fetch(`${API_URL}/api/anunturi/mele`, {
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ trimitem token
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        console.error("❌ Eroare la ștergere:", data);
-        alert(data.error || "Eroare la ștergerea anunțului");
+        console.error("❌ Eroare backend:", data);
+        return;
+      }
+
+      setAnunturi(data);
+    } catch (err) {
+      console.error("❌ Eroare fetch:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnunturileMele();
+  }, []);
+
+  // 📌 ștergere anunț
+  const handleDelete = async (id) => {
+    if (!window.confirm("Sigur vrei să ștergi acest anunț?")) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/anunturi/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Eroare la ștergere");
         return;
       }
 
       alert("✅ Anunț șters cu succes!");
-      setAnunturi(anunturi.filter((a) => a._id !== id)); // scoatem din listă
+      setAnunturi(anunturi.filter((a) => a._id !== id));
     } catch (err) {
-      console.error("❌ Eroare fetch:", err);
-      alert("Eroare de rețea la ștergere");
+      console.error("❌ Eroare la ștergere:", err);
+      alert("Eroare de rețea");
     }
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Anunțurile Mele</h1>
-      {anunturi.length === 0 ? (
-        <p>Nu ai anunțuri încă.</p>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6 text-center">Anunțurile Mele</h1>
+
+      {loading ? (
+        <p className="text-center">Se încarcă...</p>
+      ) : anunturi.length === 0 ? (
+        <p className="text-center">Nu ai anunțuri publicate.</p>
       ) : (
-        <ul className="space-y-4">
+        <div className="space-y-4">
           {anunturi.map((anunt) => (
-            <li
+            <div
               key={anunt._id}
-              className="border p-3 rounded flex justify-between items-center"
+              className="border rounded-lg p-4 shadow flex justify-between items-center"
             >
               <div>
-                <h2 className="font-semibold">{anunt.titlu}</h2>
-                <p className="text-gray-600">{anunt.pret} €</p>
+                <h2 className="text-lg font-semibold">{anunt.titlu}</h2>
+                <p className="text-gray-600">{anunt.descriere}</p>
+                <p className="font-bold text-blue-600">{anunt.pret} RON</p>
+                <p className="text-sm text-gray-500">{anunt.categorie}</p>
               </div>
-              <button
-                onClick={() => handleDelete(anunt._id)}
-                className="bg-red-600 text-white px-3 py-1 rounded"
-              >
-                Șterge
-              </button>
-            </li>
+
+              <div className="flex gap-2">
+                {/* 📌 Buton de ștergere */}
+                <button
+                  onClick={() => handleDelete(anunt._id)}
+                  className="bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Șterge
+                </button>
+
+                {/* 📌 Buton de editare (îl facem după ce confirmi că merge ștergerea) */}
+                <button
+                  onClick={() =>
+                    alert("Funcția de editare o facem imediat după test 😊")
+                  }
+                  className="bg-yellow-500 text-white px-3 py-1 rounded"
+                >
+                  Editează
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
