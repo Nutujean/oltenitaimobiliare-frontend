@@ -1,76 +1,43 @@
-import React, { useState } from "react";
-import API_URL from "./api";
+import { useState } from "react";
+import API_URL from "../api";
 
 export default function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [parola, setParola] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (password !== confirmPassword) {
-      alert("Parolele nu coincid!");
-      return;
-    }
-
     try {
-      const res = await fetch(`${API_URL}/api/register`, {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password: parola }),
       });
-
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Eroare la înregistrare");
 
-      if (!res.ok) {
-        alert(data.error || "Eroare la înregistrare");
-        return;
-      }
-
-      alert("✅ Cont creat cu succes! Acum te poți autentifica.");
-      window.location.href = "/login"; // redirect către login
+      localStorage.setItem("token", data.token);
+      alert("✅ Cont creat cu succes!");
+      window.location.href = "/";
     } catch (err) {
-      console.error("❌ Eroare fetch:", err);
-      alert("Eroare de rețea la înregistrare");
+      alert("❌ " + err.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 max-w-sm mx-auto space-y-3">
+    <form onSubmit={handleSubmit} className="p-6 max-w-md mx-auto space-y-3">
       <h1 className="text-xl font-bold mb-4">Înregistrare</h1>
-
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
+      <input type="text" placeholder="Nume" value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full border p-2 rounded" required />
+      <input type="email" placeholder="Email" value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Parolă"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Confirmă parola"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-
-      <button
-        type="submit"
-        className="bg-green-600 text-white px-4 py-2 rounded w-full"
-      >
+        className="w-full border p-2 rounded" required />
+      <input type="password" placeholder="Parola" value={parola}
+        onChange={(e) => setParola(e.target.value)}
+        className="w-full border p-2 rounded" required />
+      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded w-full">
         Creează cont
       </button>
     </form>
