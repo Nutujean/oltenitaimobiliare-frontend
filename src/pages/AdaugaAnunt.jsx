@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import API_URL from "./api"; // asigură-te că ai api.js cu export corect
+import API_URL from "./api";
 
 export default function AdaugaAnunt() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
-  const [location, setLocation] = useState(""); // 📌 locație
-  const [images, setImages] = useState([]); // fișierele selectate
+  const [location, setLocation] = useState("");
+  const [images, setImages] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,11 +23,6 @@ export default function AdaugaAnunt() {
       images.forEach((img) => {
         formData.append("images", img);
       });
-
-      // Debug — vezi ce se trimite
-      for (let [key, value] of formData.entries()) {
-        console.log("📂 FormData:", key, value);
-      }
 
       const res = await fetch(`${API_URL}/api/listings`, {
         method: "POST",
@@ -45,7 +40,6 @@ export default function AdaugaAnunt() {
       alert("✅ Anunț adăugat cu succes!");
       console.log("📥 Răspuns backend:", data);
 
-      // reset formular
       setTitle("");
       setDescription("");
       setPrice("");
@@ -88,15 +82,28 @@ export default function AdaugaAnunt() {
         required
       />
 
-      {/* 📌 Input pentru locație */}
-      <input
-        type="text"
-        placeholder="Locație (ex: Oltenița)"
+      {/* 📌 Dropdown pentru locații */}
+      <select
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         className="w-full border p-2 rounded"
         required
-      />
+      >
+        <option value="">Selectează locația</option>
+        <option value="Oltenița">Oltenița</option>
+        <option value="Chirnogi">Chirnogi</option>
+        <option value="Ulmeni">Ulmeni</option>
+        <option value="Radovanu">Radovanu</option>
+        <option value="Spanțov">Spanțov</option>
+        <option value="Chiselet">Chiselet</option>
+        <option value="Valea Roșie">Valea Roșie</option>
+        <option value="Mitreni">Mitreni</option>
+        <option value="Clătești">Clătești</option>
+        <option value="Curcani">Curcani</option>
+        <option value="Soldanu">Soldanu</option>
+        <option value="Negoești">Negoești</option>
+        <option value="Căscioarele">Căscioarele</option>
+      </select>
 
       {/* Dropdown categorii */}
       <select
@@ -114,7 +121,6 @@ export default function AdaugaAnunt() {
         <option value="Spațiu comercial">Spațiu comercial</option>
       </select>
 
-      {/* Upload imagini */}
       <input
         type="file"
         multiple
