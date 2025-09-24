@@ -1,27 +1,43 @@
 import React, { useState } from "react";
-import API_URL from "../api";
+import API_URL from "./api"; // asigură-te că ai api.js cu export corect
 
 export default function AdaugaAnunt() {
-  const [titlu, setTitlu] = useState("");
-  const [descriere, setDescriere] = useState("");
-  const [pret, setPret] = useState("");
-  const [categorie, setCategorie] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState(""); // 📌 locație
+  const [images, setImages] = useState([]); // fișierele selectate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${API_URL}/api/anunturi`, {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("price", price);
+      formData.append("category", category);
+      formData.append("location", location); // 📌 trimitem locația
+
+      images.forEach((img) => {
+        formData.append("images", img);
+      });
+
+      // Debug — vezi ce se trimite
+      for (let [key, value] of formData.entries()) {
+        console.log("📂 FormData:", key, value);
+      }
+
+      const res = await fetch(`${API_URL}/api/listings`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ titlu, descriere, pret, categorie }),
+        body: formData,
       });
 
       const data = await res.json();
 
       if (!res.ok) {
+        console.error("❌ Eroare la adăugare:", data);
         alert(data.error || "Eroare la adăugarea anunțului");
         return;
       }
@@ -30,10 +46,12 @@ export default function AdaugaAnunt() {
       console.log("📥 Răspuns backend:", data);
 
       // reset formular
-      setTitlu("");
-      setDescriere("");
-      setPret("");
-      setCategorie("");
+      setTitle("");
+      setDescription("");
+      setPrice("");
+      setCategory("");
+      setLocation("");
+      setImages([]);
     } catch (err) {
       console.error("❌ Eroare fetch:", err);
       alert("Eroare de rețea la adăugarea anunțului");
@@ -47,16 +65,16 @@ export default function AdaugaAnunt() {
       <input
         type="text"
         placeholder="Titlu"
-        value={titlu}
-        onChange={(e) => setTitlu(e.target.value)}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         className="w-full border p-2 rounded"
         required
       />
 
       <textarea
         placeholder="Descriere"
-        value={descriere}
-        onChange={(e) => setDescriere(e.target.value)}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
         className="w-full border p-2 rounded"
         required
       />
@@ -64,16 +82,26 @@ export default function AdaugaAnunt() {
       <input
         type="number"
         placeholder="Preț"
-        value={pret}
-        onChange={(e) => setPret(e.target.value)}
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        className="w-full border p-2 rounded"
+        required
+      />
+
+      {/* 📌 Input pentru locație */}
+      <input
+        type="text"
+        placeholder="Locație (ex: Oltenița)"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
         className="w-full border p-2 rounded"
         required
       />
 
       {/* Dropdown categorii */}
       <select
-        value={categorie}
-        onChange={(e) => setCategorie(e.target.value)}
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
         className="w-full border p-2 rounded"
         required
       >
@@ -85,6 +113,15 @@ export default function AdaugaAnunt() {
         <option value="Garaje">Garaje</option>
         <option value="Spațiu comercial">Spațiu comercial</option>
       </select>
+
+      {/* Upload imagini */}
+      <input
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={(e) => setImages(Array.from(e.target.files))}
+        className="w-full border p-2 rounded"
+      />
 
       <button
         type="submit"

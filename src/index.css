@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stiluri custom dacă vrei */
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gray-50;
 }
