@@ -6,7 +6,7 @@ export default function AdaugaAnunt() {
   const [descriere, setDescriere] = useState("");
   const [pret, setPret] = useState("");
   const [categorie, setCategorie] = useState("");
-
+  const [dealType, setDealType] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -36,6 +36,18 @@ export default function AdaugaAnunt() {
         <option value="Terenuri">Terenuri</option>
         <option value="Garsoniere">Garsoniere</option>
       </select>
+      {/* 🔹 Tip tranzacție */}
+<select
+  value={dealType}
+  onChange={(e) => setDealType(e.target.value)}
+  className="w-full border border-gray-300 rounded-lg p-2"
+>
+  <option value="">Selectează tipul tranzacției</option>
+  <option value="vanzare">Vând</option>
+  <option value="inchiriere">Închiriez</option>
+  <option value="cumparare">Cumpăr</option>
+  <option value="schimb">Schimb</option>
+</select>
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded w-full">Salvează</button>
     </form>
   );
