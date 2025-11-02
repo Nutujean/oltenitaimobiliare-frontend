@@ -50,5 +50,6 @@ export default function AdaugaAnunt() {
 </select>
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded w-full">Salvează</button>
     </form>
-  );
+  ); 
 }
+// netlify redeploy fix
