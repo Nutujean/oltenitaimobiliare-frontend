@@ -1,2 +1,2 @@
-const API_URL = "https://oltenitaimobiliare-backend.onrender.com";
+const API_URL = "https://oltenitaimobiliare.ro ";
 export default API_URL;
