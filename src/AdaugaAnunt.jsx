@@ -13,7 +13,7 @@ export default function AdaugaAnunt() {
       const res = await fetch(`${API_URL}/api/anunturi`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titlu, descriere, pret, categorie }),
+        body: JSON.stringify({ titlu, descriere, pret, categorie dealType }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Eroare la adăugare");
