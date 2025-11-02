@@ -52,4 +52,4 @@ export default function AdaugaAnunt() {
     </form>
   ); 
 }
-// netlify redeploy fix
+// redeploy fix tip tranzactie
