@@ -10,7 +10,7 @@ export default function AdaugaAnunt() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_URL}/api/anunturi`, {
+      const res = await fetch(`${API_URL}/api/listings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ titlu, descriere, pret, categorie, dealType }),
